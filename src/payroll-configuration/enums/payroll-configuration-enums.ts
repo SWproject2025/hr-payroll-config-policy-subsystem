@@ -20,10 +20,10 @@ export enum Applicability {
     CONTRACTORS = "Contractors",
 }
 
-export enum UserRole {
-    PAYROLL_SPECIALIST = "Payroll_Specialist",
-    HR_MANAGER = "HR_Manager",
-    PAYROLL_MANAGER = "Payroll_Manager",
-    SYS_ADMIN = "System_Admin",
-    POLICY_ADMIN = "Policy_Admin",
-}
+// export enum UserRole {
+//     PAYROLL_SPECIALIST = "Payroll_Specialist",
+//     HR_MANAGER = "HR_Manager",
+//     PAYROLL_MANAGER = "Payroll_Manager",
+//     SYS_ADMIN = "System_Admin",
+//     POLICY_ADMIN = "Policy_Admin",
+// } already defined in employee-profile.enums.ts
