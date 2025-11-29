@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory, } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import {  EmployeeProfile as Employee} from '../../employee-profile/models/employee-profile.schema';
 import { Applicability, ConfigStatus, PolicyType } from '../enums/payroll-configuration-enums';
+import { ApprovalStatus } from '../../recruitment/enums/approval-status.enum';
 
 export type payrollPoliciesDocument = HydratedDocument<payrollPolicies>
 
@@ -39,6 +40,9 @@ export class payrollPolicies {
 
     @Prop({ required: true, type: String, enum: ConfigStatus,default:ConfigStatus.DRAFT })
     status: ConfigStatus;// draft, approved, rejected
+
+    @Prop({ required: true, type: String, enum: ApprovalStatus, default: ApprovalStatus.PENDING })
+    approvalStatus: ApprovalStatus;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Employee.name })
     createdBy?: mongoose.Types.ObjectId;
