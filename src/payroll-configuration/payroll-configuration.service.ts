@@ -1,12 +1,10 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { payrollPoliciesDocument, payrollPolicies } from './models/payrollPolicies.schema';
 import { CreatePayrollPolicyDto } from './dtos/createPayrollPolicy.dto';
 import { UpdatePayrollPolicyDto } from './dtos/updatePayrollPolicy.dto';
 import { ConfigStatus } from './enums/payroll-configuration-enums';
-import { ApprovalStatus } from '../recruitment/enums/approval-status.enum';
-import { ApprovalPayrollPolicyDto } from './dtos/approvalPayRollPolicy.dto';
 
 @Injectable()
 export class PayrollConfigurationService {
@@ -60,28 +58,6 @@ export class PayrollConfigurationService {
 
     //submit for approval. (Note for next time, Use approval-status.enum)
 
-    async submaitForApproval(policyId: string, userId: string){
-        const policy = await this.policyModel.findById(policyId);
-        
-        if(!policy){
-            throw new Error('Payroll Policy Not Found');
-        }
-        if(policy.status !== ConfigStatus.DRAFT){
-            throw new Error('Only draft policies can be submitted for approval');
-        }
-        if(policy.createdBy?.toString() !== userId){
-            throw new ForbiddenException('You are only allowed to submit policies you have created');
-        }
-        
-        policy.approvalStatus = ApprovalStatus.PENDING;
-        return await policy.save();
-
-    }
-
-    //approve or reject policy (Payroll Manager)
-}
-        
-
 
 
             
@@ -97,4 +73,4 @@ export class PayrollConfigurationService {
 
     
 
-
+}
