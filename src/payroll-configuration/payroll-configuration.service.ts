@@ -1,6 +1,6 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { payrollPoliciesDocument, payrollPolicies } from './models/payrollPolicies.schema';
 import { allowanceDocument, allowance } from './models/allowance.schema';
 import { CreatePayrollPolicyDto } from './dtos/createPayrollPolicy.dto';
@@ -9,8 +9,32 @@ import { ConfigStatus } from './enums/payroll-configuration-enums';
 import { CreateAllowanceDto } from './dtos/createAllowance.dto';
 import { UpdateAllowanceDto } from './dtos/updateAllowance.dto';
 import { SystemRole } from '../employee-profile/enums/employee-profile.enums';
-
+import {payGradeDocument, payGrade} from './models/payGrades.schema';
+import { CreatePayGradeDto } from './dtos/createPayGrade.dto';
+import { UpdatePayGradeDto } from './dtos/updatePayGrade.dto';
+import { CreateInsureBracketDto } from './dtos/createInsureBracket.dto';
+import { UpdateInsureBracketDto } from './dtos/updateInsureBracket.dto';
+import {insuranceBracketsDocument, insuranceBrackets} from './models/insuranceBrackets.schema';
+import { CreateSigningBonusDto } from './dtos/createSigningBonus.dto';
+import { UpdateSigningBonusDto } from './dtos/updateSigningBonus.dto';
+import { signingBonusDocument, signingBonus } from './models/signingBonus.schema';
+import { LegalRules, LegalRulesDocument } from './models/legalRules.schema';
+import { CompanyWideSettingsDocument, CompanyWideSettings } from './models/CompanyWideSettings.schema';
+import { payTypeDocument, payType } from './models/payType.schema';
+import { CreatePayTypeDto } from './dtos/createPayType.dto';
+import { UpdatePayTypeDto } from './dtos/updatePayType.dto';
+import { terminationAndResignationBenefitsDocument, terminationAndResignationBenefits } from './models/terminationAndResignationBenefits';
+import { CreateCompanyWideSettingDto } from './dtos/createCompanyWideSetting.dto';
+import { UpdateCompanyWideSettingDto } from './dtos/updateCompanyWideSetting.dto';
+import { CreateTermResBenDto } from './dtos/createTermResBen.dto';
+import { UpdateTermResBenDto } from './dtos/updateTermResBen.dto';
+import { updateLegalDto } from './dtos/updateLegal.dto';
+import { CreateTaxRuleDto } from './dtos/createTaxRules.dto';
+import { taxRules, taxRulesDocument } from './models/taxRules.schema';
 //import { EmployeeSystemRoleDocument, EmployeeSystemRole } from '../employee-profile/models/employee-system-role.schema';
+
+
+
 
 @Injectable()
 export class PayrollConfigurationService {
@@ -20,10 +44,26 @@ export class PayrollConfigurationService {
     private policyModel: Model<payrollPoliciesDocument>,
     @InjectModel(allowance.name)
     private allowanceModel: Model<allowanceDocument>,
+    @InjectModel(payGrade.name)
+    private payGradeModel: Model<payGradeDocument>,
+    @InjectModel(insuranceBrackets.name)
+    private insuranceBracketModel: Model<insuranceBracketsDocument>,
+    @InjectModel(signingBonus.name)
+    private signingBonusModel: Model<signingBonusDocument>,
+    @InjectModel(LegalRules.name)
+    private legalRulesModel: Model<LegalRulesDocument>,
+    @InjectModel(CompanyWideSettings.name)
+    private companyWideSettingsModel: Model<CompanyWideSettingsDocument>,
+    @InjectModel(terminationAndResignationBenefits.name)
+    private terminationAndResignationBenefitsModel: Model<terminationAndResignationBenefitsDocument>,
+    @InjectModel(payType.name)
+    private payTypeModel: Model<payTypeDocument>,
+    @InjectModel(taxRules.name)
+    private taxRulesModel: Model<taxRulesDocument>
   ) {}
  	 
     //payroll specialist:
-    //create / edit payroll policy (draft) and view all
+    //create / edit payroll policy (draft) and view one/all
 
     async createPayrollPolicy(dto: CreatePayrollPolicyDto, userId: string){
         const newPolicy = new this.policyModel({
@@ -69,6 +109,184 @@ export class PayrollConfigurationService {
         }
         return policy;
     }
+
+    //paygrades definition
+    //use the allowance from before in parameters
+
+   async calculateGrossSalary(baseSalary: number,
+  allowanceIds: (string | ObjectId)[]): Promise<number> {
+  const allowances = await this.allowanceModel.find({
+    _id: { $in: allowanceIds },
+    status: ConfigStatus.APPROVED, // only approved allowances count
+  });
+
+  const totalAllowanceAmount = allowances.reduce(
+    (sum, a) => sum + (a.amount || 0),
+    0,
+  );
+
+  return baseSalary + totalAllowanceAmount;
+}
+
+    async createPayGrade(dto: CreatePayGradeDto, userId: string) {
+  const grossSalary = await this.calculateGrossSalary(
+    dto.baseSalary,
+    dto.allowance,   
+  );
+
+  const grade = new this.payGradeModel({
+    ...dto,
+    grossSalary,
+    createdBy: userId,
+    status: ConfigStatus.DRAFT,
+  });
+
+  return grade.save();
+}
+
+async updatePayGrade(id: string, dto: UpdatePayGradeDto, userId: string) {
+  const grade = await this.payGradeModel.findById(id);
+  if (!grade) throw new Error('Pay grade not found');
+
+  if (grade.status !== ConfigStatus.DRAFT)
+    throw new Error('Only draft pay grades may be edited');
+
+  Object.assign(grade, dto);
+
+//   grade.grossSalary = await this.calculateGrossSalary(
+//     grade.baseSalary,
+//     grade.allowance,
+//   );
+
+ return grade.save();
+}
+
+
+    async createInsuranceBracket(dto: CreateInsureBracketDto, userId: string) {
+       const bracket = new this.insuranceBracketModel({
+           ...dto,
+           createdBy: userId,
+           status: ConfigStatus.DRAFT
+       })
+    }
+
+    async updateInsuranceBracket(id: string, dto: UpdateInsureBracketDto, userId: string) {
+        const bracket = await this.insuranceBracketModel.findById(id);
+        if (!bracket) throw new Error('Pay grade not found');
+    
+        if (bracket.status !== ConfigStatus.DRAFT)
+          throw new Error('Only draft pay grades may be edited');
+    
+        Object.assign(bracket, dto); // Update the properties of grade with the properties from dto
+        return bracket.save();
+    }
+
+    async createSigningBonus(dto: CreateSigningBonusDto, userId: string) {
+        const bonus = new this.signingBonusModel({
+            ...dto,
+            createdBy: userId,
+            status: ConfigStatus.DRAFT
+        })
+        return await bonus.save();
+
+     }
+
+     async updateSigningBonus(id: string, dto: UpdateSigningBonusDto, userId: string) {
+        const bonus = await this.signingBonusModel.findById(id);
+        if (!bonus) throw new Error('Pay grade not found');
+    
+        if (bonus.status !== ConfigStatus.DRAFT)
+          throw new Error('Only draft pay grades may be edited');
+    
+        Object.assign(bonus, dto); // Update the properties of grade with the properties from dto
+        return await bonus.save();
+    }
+
+    //termination
+    
+    
+    async createTerminationAndResignationBenefits(dto: CreateTermResBenDto, userId: string){
+        const benefits = new this.terminationAndResignationBenefitsModel({
+            ...dto,
+            createdBy: userId,
+            status: ConfigStatus.DRAFT
+        });
+        return await benefits.save();
+    }
+
+    async updateTerminationAndResignationBenefits(id: string, dto: UpdateTermResBenDto, userId: string){
+        const benefits = await this.terminationAndResignationBenefitsModel.findById(id);
+        if (!benefits) throw new Error('Benefit not found');
+    
+        if (benefits.status !== ConfigStatus.DRAFT)
+          throw new Error('Only draft benefits may be edited');
+    
+        Object.assign(benefits, dto); // Update the properties of grade with the properties from dto
+        return await benefits.save();
+    }
+
+    async createPayType(dto: CreatePayTypeDto, userId: string){
+        const payType = new this.payTypeModel({
+            ...dto,
+            createdBy: userId,
+            status: ConfigStatus.DRAFT
+        });
+        return await payType.save();
+    }
+
+    async updatePayType(id: string, dto: UpdatePayTypeDto, userId: string){
+        const payType = await this.payTypeModel.findById(id);
+        if (!payType) throw new Error('Pay type not found');
+    
+        if (payType.status !== ConfigStatus.DRAFT)
+          throw new Error('Only draft pay types may be edited');
+    
+        Object.assign(payType, dto); 
+        return await payType.save();
+    } 
+
+    async editLegal( dto: updateLegalDto, userId: string){
+        const legal = await this.legalRulesModel.findById(userId);
+        if (!legal) throw new Error('Legal not found');
+    
+        Object.assign(legal, dto); 
+        return await legal.save();
+    }
+
+    async createTaxRules (dto: CreateTaxRuleDto, userId: string){
+        const taxRules = new this.taxRulesModel({
+            ...dto,
+            createdBy: userId,
+            status: ConfigStatus.DRAFT
+        });
+        return await taxRules.save();
+    }
+
+    async createCompanyWideSeting(dto: CreateCompanyWideSettingDto, userId: string){
+        const setting = new this.companyWideSettingsModel({
+            ...dto,
+            createdBy: userId,
+            //wont default to status draFT
+        })
+        return await setting.save();
+    }
+
+    async updateCompanyWideSeting(id: string, dto: UpdateCompanyWideSettingDto, userId: string){
+        const setting = await this.companyWideSettingsModel.findById(id);
+        if (!setting) throw new Error('Company wide setting not found');
+
+        Object.assign(setting, dto); 
+        return setting.save();
+    }
+
+    
+
+
+
+
+
+
+
 
 
     //submit for approval. (Note for next time, Use approval-status.enum)
@@ -156,6 +374,13 @@ export class PayrollConfigurationService {
         return await policy.save();
         
     }
+
+
+
+
+
+
+
 
     
 

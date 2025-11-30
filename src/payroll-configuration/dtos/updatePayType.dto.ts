@@ -1,5 +1,5 @@
 
 import { PartialType } from "@nestjs/mapped-types";
-import { createPayTypeDto } from "./createPayType.dto";
+import { CreatePayTypeDto } from "./createPayType.dto";
 
-export class updatePayTypeDto extends PartialType( createPayTypeDto ) {}
+export class UpdatePayTypeDto extends PartialType( CreatePayTypeDto ) {}

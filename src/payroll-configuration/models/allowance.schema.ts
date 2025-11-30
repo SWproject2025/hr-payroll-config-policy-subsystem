@@ -17,6 +17,8 @@ export class allowance {
     @Prop({ required: true, type: String, enum: ConfigStatus,default:ConfigStatus.DRAFT })
     status: ConfigStatus;// draft, approved, rejected
 
+   
+
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Employee.name })
     createdBy?: mongoose.Types.ObjectId; 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Employee.name })
