@@ -85,10 +85,11 @@ export class PayrollConfigurationService {
             throw new ForbiddenException('You are only allowed to submit policies you have created');
         }
         
-       //policy status remains draft until set to pending by manager, then no editing allowed
+        policy.status = ConfigStatus.PENDING;
+       
         return await policy.save();
         
-        // policy.approvalStatus = ApprovalStatus.PENDING;
+        // policy.approvalStatus = ApprovalStatus.PENDING; //nvm. this is for hiring. Might make enum atribute for pending?
         // return await policy.save();
     }
 
@@ -96,7 +97,7 @@ export class PayrollConfigurationService {
         const newAllowance = new this.allowanceModel({
             ...dto,
             createdBy: userId, //remember to remove created by from dtos
-            status: ConfigStatus.DRAFT //policy status remains draft until set to pending by manager, then no editing allowed
+            status: ConfigStatus.DRAFT //policy status remains draft until sent to manager, then no editing allowed
         })
         return await newAllowance.save();
     }
