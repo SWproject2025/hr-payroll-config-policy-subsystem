@@ -375,6 +375,102 @@ async updatePayGrade(id: string, dto: UpdatePayGradeDto, userId: string) {
         
     }
 
+    //what remains of the getAll/getOne functions:
+
+    //pay grade
+    async findAllPayGrades(): Promise<payGrade[]> {
+  return await this.payGradeModel.find().exec();
+    }
+
+async findOnePayGrade(id: string): Promise<payGrade> {
+  const grade = await this.payGradeModel.findById(id);
+  if (!grade) throw new Error('Pay grade not found');
+  return grade;
+}
+
+//ins bracket
+async findAllInsuranceBrackets(): Promise<insuranceBrackets[]> {
+  return await this.insuranceBracketModel.find().exec();
+}
+
+async findOneInsuranceBracket(id: string): Promise<insuranceBrackets> {
+  const bracket = await this.insuranceBracketModel.findById(id);
+  if (!bracket) throw new Error('Insurance bracket not found');
+  return bracket;
+}
+
+//signing bonus:
+async findAllSigningBonuses(): Promise<signingBonus[]> {
+  return await this.signingBonusModel.find().exec();
+}
+
+async findOneSigningBonus(id: string): Promise<signingBonus> {
+  const bonus = await this.signingBonusModel.findById(id);
+  if (!bonus) throw new Error('Signing bonus not found');
+  return bonus;
+}
+
+//term res
+async findAllTerminationAndResignationBenefits(): Promise<terminationAndResignationBenefits[]> {
+  return await this.terminationAndResignationBenefitsModel.find().exec();
+}
+
+async findOneTerminationAndResignationBenefit(id: string): Promise<terminationAndResignationBenefits> {
+  const benefit = await this.terminationAndResignationBenefitsModel.findById(id);
+  if (!benefit) throw new Error('Benefit not found');
+  return benefit;
+}
+
+//paytypes
+async findAllPayTypes(): Promise<payType[]> {
+  return await this.payTypeModel.find().exec();
+}
+
+async findOnePayType(id: string): Promise<payType> {
+  const ptype = await this.payTypeModel.findById(id);
+  if (!ptype) throw new Error('Pay type not found');
+  return ptype;
+}
+
+//legal
+async findAllLegalRules(): Promise<LegalRules[]> {
+  return await this.legalRulesModel.find().exec();
+}
+
+async findOneLegalRule(id: string): Promise<LegalRules> {
+  const rule = await this.legalRulesModel.findById(id);
+  if (!rule) throw new Error('Legal rule not found');
+  return rule;
+}
+
+//companywide setting:
+async findAllCompanyWideSettings(): Promise<CompanyWideSettings[]> {
+  return await this.companyWideSettingsModel.find().exec();
+}
+
+async findOneCompanyWideSetting(id: string): Promise<CompanyWideSettings> {
+  const setting = await this.companyWideSettingsModel.findById(id);
+  if (!setting) throw new Error('Company-wide setting not found');
+  return setting;
+}
+
+//tax rules:
+async findAllTaxRules(): Promise<taxRules[]> {
+  return await this.taxRulesModel.find().exec();
+}
+
+async findOneTaxRule(id: string): Promise<taxRules> {
+  const rule = await this.taxRulesModel.findById(id);
+  if (!rule) throw new Error('Tax rule not found');
+  return rule;
+}
+
+
+
+
+
+
+
 
 
 
