@@ -17,24 +17,25 @@ export class InsuranceBracketController {
   }
 
   @Patch(':id')
-  @Roles(SystemRole.PAYROLL_SPECIALIST)
+  @Roles(SystemRole.PAYROLL_SPECIALIST, SystemRole.HR_MANAGER)
   update(@Param('id') id: string, @Body() dto: UpdateInsureBracketDto, @Req() req) {
     return this.service.updateInsuranceBracket(id, dto, req.user._id);
   }
 
   @Get()
-  @Roles(SystemRole.PAYROLL_SPECIALIST, SystemRole.PAYROLL_MANAGER)
+  @Roles(SystemRole.PAYROLL_SPECIALIST, SystemRole.PAYROLL_MANAGER, SystemRole.HR_MANAGER)
   getAll() {
     return this.service.findAllInsuranceBrackets();
   }
 
   @Get(':id')
-  @Roles(SystemRole.PAYROLL_SPECIALIST, SystemRole.PAYROLL_MANAGER)
+  @Roles(SystemRole.PAYROLL_SPECIALIST, SystemRole.PAYROLL_MANAGER, SystemRole.HR_MANAGER)
   getOne(@Param('id') id: string) {
     return this.service.findOneInsuranceBracket(id);
   }
+
+  
+
+
 }
-
-
-
 

@@ -1,4 +1,4 @@
-import { Controller , Post , Patch, Get, Param, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller , Post , Patch, Get, Param, Body, UseGuards, Req, Delete } from '@nestjs/common';
 import { PayrollConfigurationService } from '../../payroll-configuration.service';
 import { Roles } from '../../../Common/Decorators/roles.decorator';
 import { RolesGuard } from '../../../Common/Gaurds/roles.gaurd';
@@ -60,9 +60,15 @@ export class PayrollPolicyController {
   }
 
   @Post(':id/publish')
-  @Roles(SystemRole.PAYROLL_MANAGER)
+  @Roles(SystemRole.PAYROLL_SPECIALIST)
   submitPolicy(@Param('id') policyId: string, @Req() req) {
     return this.payrollConfigurationService.submaitForApproval(policyId, req.user);
+  }
+
+  @Delete(':id')
+  @Roles(SystemRole.PAYROLL_SPECIALIST)
+  delete(@Param('id') id: string) {
+    return this.payrollConfigurationService.deletePayrollPolicy(id);
   }
 
 

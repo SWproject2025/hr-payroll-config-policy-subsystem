@@ -32,6 +32,7 @@ import { updateLegalDto } from './dtos/updateLegal.dto';
 import { CreateTaxRuleDto } from './dtos/createTaxRules.dto';
 import { taxRules, taxRulesDocument } from './models/taxRules.schema';
 import { createLegalDto } from './dtos/createLegal.dto';
+import { UpdateTaxRuleDto } from './dtos/updateTaxRules.dto';
 //import { EmployeeSystemRoleDocument, EmployeeSystemRole } from '../employee-profile/models/employee-system-role.schema';
 
 
@@ -299,7 +300,7 @@ async updatePayGrade(id: string, dto: UpdatePayGradeDto, userId: string) {
         return await setting.save();
     }
 
-    async updateCompanyWideSeting(id: string, dto: UpdateCompanyWideSettingDto, userId: string){
+    async updateCompanyWideSeting(id: string, dto: UpdateCompanyWideSettingDto){
         const setting = await this.companyWideSettingsModel.findById(id);
         if (!setting) throw new Error('Company wide setting not found');
 
@@ -516,6 +517,21 @@ async findOneTaxRule(id: string): Promise<taxRules> {
   if (!rule) throw new Error('Tax rule not found');
   return rule;
 }
+
+async updateTaxRule(id: string, dto: UpdateTaxRuleDto, userId: string){
+  const tax = await this.taxRulesModel.findById(userId);
+  if (!tax) throw new Error('Tax rule not found');
+
+  Object.assign(tax, dto); 
+  return await tax.save();
+}
+
+async deleteTaxRule(id: string) {
+  const tax = await this.taxRulesModel.findByIdAndDelete(id);
+  if (!tax) throw new Error('Tax rule not found');
+  return await this.taxRulesModel.findByIdAndDelete(id);
+}
+  
 
 
 
