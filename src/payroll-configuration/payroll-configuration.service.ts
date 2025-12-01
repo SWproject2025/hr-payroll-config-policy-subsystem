@@ -31,6 +31,7 @@ import { UpdateTermResBenDto } from './dtos/updateTermResBen.dto';
 import { updateLegalDto } from './dtos/updateLegal.dto';
 import { CreateTaxRuleDto } from './dtos/createTaxRules.dto';
 import { taxRules, taxRulesDocument } from './models/taxRules.schema';
+import { createLegalDto } from './dtos/createLegal.dto';
 //import { EmployeeSystemRoleDocument, EmployeeSystemRole } from '../employee-profile/models/employee-system-role.schema';
 
 
@@ -61,7 +62,8 @@ export class PayrollConfigurationService {
     @InjectModel(taxRules.name)
     private taxRulesModel: Model<taxRulesDocument>
   ) {}
- 	 
+
+
     //payroll specialist:
     //create / edit payroll policy (draft) and view one/all
 
@@ -108,6 +110,15 @@ export class PayrollConfigurationService {
             throw new Error('Payroll Policy Not Found');
         }
         return policy;
+    }
+
+    async deletePolicy(id: string){
+        const policy = await this.policyModel.findById(id);
+        if(!policy){
+            throw new Error('Payroll Policy Not Found');
+        }
+        
+        return await this.policyModel.findByIdAndDelete(id);
     }
 
     //paygrades definition
@@ -161,6 +172,11 @@ async updatePayGrade(id: string, dto: UpdatePayGradeDto, userId: string) {
  return grade.save();
 }
 
+  async deletePayGrade(id: string) {
+    const grade = await this.payGradeModel.findById(id);
+    if (!grade) throw new Error('Pay grade not found');
+    return await this.payGradeModel.findByIdAndDelete(id);
+  }
 
     async createInsuranceBracket(dto: CreateInsureBracketDto, userId: string) {
        const bracket = new this.insuranceBracketModel({
@@ -193,10 +209,10 @@ async updatePayGrade(id: string, dto: UpdatePayGradeDto, userId: string) {
 
      async updateSigningBonus(id: string, dto: UpdateSigningBonusDto, userId: string) {
         const bonus = await this.signingBonusModel.findById(id);
-        if (!bonus) throw new Error('Pay grade not found');
+        if (!bonus) throw new Error('Signing bonus not found');
     
         if (bonus.status !== ConfigStatus.DRAFT)
-          throw new Error('Only draft pay grades may be edited');
+          throw new Error('Only draft signing bonuses may be edited');
     
         Object.assign(bonus, dto); // Update the properties of grade with the properties from dto
         return await bonus.save();
@@ -225,6 +241,12 @@ async updatePayGrade(id: string, dto: UpdatePayGradeDto, userId: string) {
         return await benefits.save();
     }
 
+    async deleteTermResBen(id: string) {
+        const benefits = await this.terminationAndResignationBenefitsModel.findById(id);
+        if (!benefits) throw new Error('Benefit not found');
+        return await this.terminationAndResignationBenefitsModel.findByIdAndDelete(id);
+    }
+
     async createPayType(dto: CreatePayTypeDto, userId: string){
         const payType = new this.payTypeModel({
             ...dto,
@@ -244,6 +266,12 @@ async updatePayGrade(id: string, dto: UpdatePayGradeDto, userId: string) {
         Object.assign(payType, dto); 
         return await payType.save();
     } 
+
+    async deletePayType(id: string) {
+        const payType = await this.payTypeModel.findById(id);
+        if (!payType) throw new Error('Pay type not found');
+        return await this.payTypeModel.findByIdAndDelete(id);
+    }
 
     async editLegal( dto: updateLegalDto, userId: string){
         const legal = await this.legalRulesModel.findById(userId);
@@ -357,6 +385,7 @@ async updatePayGrade(id: string, dto: UpdatePayGradeDto, userId: string) {
         }
         policy.status = ConfigStatus.APPROVED;
         policy.approvedBy = user._id.toString(); //correct later
+        policy.approvedAt = new Date();
         return await policy.save();
         
     }
@@ -371,6 +400,7 @@ async updatePayGrade(id: string, dto: UpdatePayGradeDto, userId: string) {
         }
         policy.status = ConfigStatus.REJECTED;
         policy.approvedBy = user._id.toString(); //correct later
+        policy.approvedAt = new Date();
         return await policy.save();
         
     }
@@ -442,6 +472,28 @@ async findOneLegalRule(id: string): Promise<LegalRules> {
   if (!rule) throw new Error('Legal rule not found');
   return rule;
 }
+
+async updateLegalRule(id: string, dto: updateLegalDto, userId: string){
+  const legal = await this.legalRulesModel.findById(userId);
+  if (!legal) throw new Error('Legal rule not found');
+
+  Object.assign(legal, dto); 
+  return await legal.save();
+}
+
+async createLegalRule(dto: createLegalDto, userId: string){
+  const legal = await this.legalRulesModel.create(dto);
+
+  return await legal.save();
+  
+}
+
+async deleteLegalRule(id: string) {
+  const legal = await this.legalRulesModel.findByIdAndDelete(id);
+  if (!legal) throw new Error('Legal rule not found');
+  return await this.legalRulesModel.findByIdAndDelete(id);
+}
+
 
 //companywide setting:
 async findAllCompanyWideSettings(): Promise<CompanyWideSettings[]> {

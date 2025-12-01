@@ -47,5 +47,23 @@ export class PayrollPolicyController {
     return this.payrollConfigurationService.getOnePayrollPolicy(id);
   }
 
+  @Patch(':id/approve')
+  @Roles(SystemRole.PAYROLL_MANAGER)
+  approvePolicy(@Param('id') policyId: string, @Req() req) {
+    return this.payrollConfigurationService.approvePolicy(policyId, req.user);
+  }
+
+  @Patch(':id/reject')
+  @Roles(SystemRole.PAYROLL_MANAGER)
+  rejectPolicy(@Param('id') policyId: string, @Req() req) {
+    return this.payrollConfigurationService.rejectPolicy(policyId, req.user);
+  }
+
+  @Post(':id/publish')
+  @Roles(SystemRole.PAYROLL_MANAGER)
+  submitPolicy(@Param('id') policyId: string, @Req() req) {
+    return this.payrollConfigurationService.submaitForApproval(policyId, req.user);
+  }
+
 
 }
