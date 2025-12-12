@@ -20,7 +20,10 @@ import { PayGradeController } from './Controllers/pay-grade/pay-grade.controller
 import {InsuranceBracketController} from "./Controllers/insurance-bracket/insurance-bracket.controller";
 import { LegalRulesController } from './Controllers/legal-rules/legal-rules.controller';
 import { CompanyWideSettingsController } from './Controllers/company-wide-settings/company-wide-settings.controller';
-
+import { PayTypeController } from './Controllers/pay-type/pay-type.controller';
+import { SigningBonusController } from './Controllers/signing-bonus/signing-bonus.controller';
+import { TerminationResignationBenefitsController } from './Controllers/termination-resignation-benefits/termination-resignation-benefits.controller';
+import { LegalRules } from './models/legalRules.schema';
 
 @Module({
   imports: [
@@ -33,11 +36,13 @@ import { CompanyWideSettingsController } from './Controllers/company-wide-settin
       { name: payrollPolicies.name, schema: payrollPoliciesSchema },
       { name: terminationAndResignationBenefits.name, schema: terminationAndResignationBenefitsSchema },
       { name: CompanyWideSettings.name, schema: CompanyWideSettingsSchema },
-      { name: payGrade.name, schema: payTypeSchema }
+      { name: payGrade.name, schema: payTypeSchema },
+      { name: LegalRules.name, schema: taxRulesSchema},
     ]),
   ],
   controllers: [PayrollPolicyController, AllowanceController, PayGradeController, InsuranceBracketController, CompanyWideSettingsController,
-    LegalRulesController
+    LegalRulesController, PayTypeController, SigningBonusController, TerminationResignationBenefitsController,
+
   ],
   providers: [PayrollConfigurationService, RolesGuard],
   exports:[PayrollConfigurationService]

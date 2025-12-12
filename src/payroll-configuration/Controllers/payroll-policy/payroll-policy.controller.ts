@@ -66,9 +66,9 @@ export class PayrollPolicyController {
   }
 
   @Delete(':id')
-  @Roles(SystemRole.PAYROLL_SPECIALIST)
+  @Roles(SystemRole.PAYROLL_MANAGER)
   delete(@Param('id') id: string) {
-    return this.payrollConfigurationService.deletePayrollPolicy(id);
+    return this.payrollConfigurationService.deletePolicy(id);
   }
 
 
